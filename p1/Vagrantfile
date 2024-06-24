@@ -1,0 +1,27 @@
+
+Vagrant.configure(2) do |config|
+    config.vm.box = "debian/bookworm64"
+    config.vm.synced_folder "./shared", "/vagrant_shared"
+    config.vm.define "josuna-tS" do |server|
+        server.vm.hostname = "josuna-tS"
+        server.vm.network :private_network, ip: "192.168.56.110"
+        server.vm.provider "virtualbox" do |v|
+            v.name = "josuna-tS"
+            v.memory = 1024
+            v.cpus = 1
+        end
+        server.vm.provision "shell",
+        inline: "export K3S_TOKEN=1234; wget -qO- https://get.k3s.io | INSTALL_K3S_EXEC=--flannel-iface=eth1 sh - && cp /var/lib/rancher/k3s/server/token /vagrant_shared ;"
+    end
+    config.vm.define "josuna-tSW" do |slave|
+        slave.vm.hostname = "josuna-tSW"
+        slave.vm.network :private_network, ip: "192.168.56.111"
+        slave.vm.provider "virtualbox" do |v|
+            v.name = "josuna-tSW"
+            v.memory = 1024
+            v.cpus = 1
+        end
+        slave.vm.provision "shell",
+        inline: "wget -qO- https://get.k3s.io | K3S_URL=https://192.168.56.110:6443 K3S_TOKEN_FILE=/vagrant_shared/token INSTALL_K3S_EXEC=--flannel-iface=eth1 sh -;"
+    end
+    end
