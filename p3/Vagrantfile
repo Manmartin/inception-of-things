@@ -11,15 +11,15 @@ Vagrant.configure("2") do |config|
       vb.memory = "2048"
       vb.cpus   = "2"
     end
-# https://devopswithgopal.hashnode.dev/how-to-configure-argocd-ui-and-cli
+
     host.vm.provision "file", source: "./scripts/k3d.sh", destination: "k3d.sh"
     host.vm.provision "file", source: "./conf/ingress.yml", destination: "ingress.yml"
-    host.vm.provision "file", source: "./conf/a.yml", destination: "install.yml"
-    host.vm.provision "file", source: "./conf/b.yml", destination: "b.yml"
+    host.vm.provision "file", source: "./conf/app.yml", destination: "app.yml"
+
     host.vm.provision :shell, inline:<<-SHELL
     chmod +x k3d.sh
     ./k3d.sh
     SHELL
   end
-  
+
 end
