@@ -19,7 +19,7 @@ sudo apt-get update
 sudo apt-get install -y curl docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # k3d (https://k3d.io/v5.6.3/#what-is-k3d)
-curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.0.0 bash
+curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.8.3 bash
 k3d cluster create my-cluster --api-port 6443 -p 8080:80@loadbalancer -p 8888:8888@loadbalancer --agents 2
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 chmod 777 kubectl
@@ -37,3 +37,7 @@ echo $podname
 kubectl wait  --timeout=-1s --for=jsonpath='{.status.phase}'=Running pod/$podname -n argocd
 sleep 10s
 argocd admin initial-password -n argocd | head -n1
+sudo curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+sudo helm repo add gitlab https://charts.gitlab.io/
+sudo helm repo update
+sudo helm upgrade --install gitlab gitlab/gitlab   --timeout 600s   --set certmanager-issuer.email=me@example.com --set global.edition=ce
